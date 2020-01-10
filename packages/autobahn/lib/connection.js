@@ -18,13 +18,18 @@ var util = require('./util.js');
 var log = require('./log.js');
 var autobahn = require('./autobahn.js');
 
+var errortype = '';
+
+// To Delete
+// var globalerr = function(){
+//    return errortype
+// }
 
 var Connection = function (options) {
 
    var self = this;
 
    self._options = options;
-
 
    // Deferred factory
    //
@@ -277,7 +282,9 @@ Connection.prototype.open = function () {
       self._transport.onopen = function () {
 
          // reset auto-reconnect timer and tracking
-         self._autoreconnect_reset();
+         if (errortype === "wamp.error.no_such_procedure"){
+            self._autoreconnect_reset();
+         }
 
          // log successful connections
          self._connect_successes += 1;
@@ -305,7 +312,13 @@ Connection.prototype.open = function () {
       self._session.onleave = function (reason, details) {
          self._session_close_reason = reason;
          self._session_close_message = details.message || "";
-         self._retry = false;
+         if (reason === 'wamp.error.no_such_procedure') {
+            self._retry = true;
+            errortype = 'wamp.error.no_such_procedure';
+            // globalerr(errortype) TO Delete
+         } else {
+            self._retry = false;
+         }
          self._transport.close();
       };
 
@@ -468,3 +481,4 @@ Object.defineProperty(Connection.prototype, "isRetrying", {
 
 
 exports.Connection = Connection;
+// exports.globalerr = globalerr; To Delete

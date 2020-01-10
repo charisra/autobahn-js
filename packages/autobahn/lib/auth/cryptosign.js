@@ -16,7 +16,6 @@ var util = require('../util.js');
 var log = require('../log.js');
 var connection = require('../connection.js');
 
-
 function load_private_key (name, force_regenerate) {
     var seed = util.atob(localStorage.getItem(name));
     if (!seed || force_regenerate) {
@@ -46,9 +45,21 @@ exports.delete_private_key = delete_private_key;
 
 
 function sign_challenge (pkey, extra) {
-   var challenge = util.htob(extra.challenge);
-   var signature = nacl.sign.detached(challenge, pkey.secretKey);
-   var res = util.btoh(signature) + util.btoh(challenge);
+    // To Delete
+    // var errortype = connection.globalerr();
+    // console.log(errortype)
+    // if (errortype === "wamp.error.no_such_procedure" || errortype == ""){
+    //     var challenge = util.htob(extra.challenge);
+    //     var signature = nacl.sign.detached(challenge, pkey.secretKey);
+    //     var res = util.btoh(signature) + util.btoh(challenge);
+    // } else {
+    //     console.log('Error, not able to continue authorization')
+    //     return false
+    // }
+    var challenge = util.htob(extra.challenge);
+    var signature = nacl.sign.detached(challenge, pkey.secretKey);
+    var res = util.btoh(signature) + util.btoh(challenge);
+
    return res;
 }
 
@@ -63,6 +74,7 @@ exports.public_key = public_key;
 
 
 function create_connection (config) {
+
 
     var url = config.url;
     var realm = config.realm;
